@@ -1,0 +1,45 @@
+﻿@model MoodDetector.Models.Entities.Facebook.PostsAnalysis
+@{
+    ViewBag.Title = "AnalyzeAllMyPosts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>AnalyzeAllMyPosts</h2>
+@if (Model != null && Model.UserPosts != null && Model.UserPosts.Count() > 0)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.ActionLink(linkText: "Analyze All My Posts",
+               actionName: "AnalyzeAllMyPosts", controllerName: "Facebook",
+               routeValues: null,
+               htmlAttributes: new { @class = "btn btn-primary" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Message</label>
+            </div>
+            <div class="col-md-4">
+                <label>Key Phrases</label>
+            </div>
+            <div class="col-md-4">
+                <label>Sentiment</label>
+            </div>
+        </div>
+        @foreach (var singlePost in Model.UserPosts)
+                {
+            <div class="row">
+                <div class="col-md-4">
+                    <label>@singlePost.Message</label>
+                </div>
+                <div class="col-md-4">
+                    <label>@String.Join(",", singlePost.FacebookUserPostKeyPhrases.Select(p=>p.KeyPhrases).ToArray())</label>
+                </div>
+                <div class="col-md-4">
+                    <label>@String.Join(",", singlePost.FacebookUserPostSentiments.Select(p=>p.Score.ToString()).ToArray())</label>
+                </div>
+            </div>
+        }
+    </div>
+}

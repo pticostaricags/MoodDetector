@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="e2819f09-301c-448c-9a46-f91b656eb17a" ChangeDateTime="04/18/2017 16:12:11">
+    <Property Name="ElementName" Value="[dbo].[FacebookProfile].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookProfile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Facebook" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9830731a-5a0a-491d-ba86-583ecaedc554" ChangeDateTime="04/18/2017 16:12:23">
+    <Property Name="ElementName" Value="[dbo].[FacebookProfile].[Facebook]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookProfile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FacebookProfileId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bf6f344f-61e2-44a0-be53-d9893af2002a" ChangeDateTime="04/18/2017 16:52:01">
+    <Property Name="ElementName" Value="[dbo].[FacebookUserPost].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookUserPost]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PostId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="08559849-a8ad-41b4-85d5-730d3e35693a" ChangeDateTime="04/18/2017 16:52:06">
+    <Property Name="ElementName" Value="[dbo].[FacebookProfile].[FacebookProfileId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookProfile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProfileId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="079352da-7a48-4166-b12e-aa1df6c9a1a8" ChangeDateTime="04/18/2017 16:52:11">
+    <Property Name="ElementName" Value="[dbo].[FacebookProfile].[FacebookUsername]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookProfile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Username" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f76961c7-c588-41a2-a063-909da55a506d" ChangeDateTime="04/18/2017 16:59:31">
+    <Property Name="ElementName" Value="[dbo].[FacebookUserPost].[FacebookProfileId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookUserPost]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ProfileId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="399f74ff-eb84-4139-ad43-b3a22612f00a" ChangeDateTime="04/18/2017 21:47:53">
+    <Property Name="ElementName" Value="[dbo].[FacebookUserPostSentiment].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookUserPostSentiment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FacebookUserPostSentimentId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1f9ddd5b-1ee4-4500-b2bc-f1af048f858f" ChangeDateTime="04/18/2017 21:48:12">
+    <Property Name="ElementName" Value="[dbo].[FacebookUserPostSentiment].[Facebook]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookUserPostSentiment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FacebookUserPostId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="099642ac-1a0c-4def-85ec-2dfdd08ea29b" ChangeDateTime="04/19/2017 11:54:08">
+    <Property Name="ElementName" Value="[dbo].[FacebookUserPostKeyPhrases].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookUserPostKeyPhrases]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FacebookUserPostKeyPhrasesId" />
+  </Operation>
+</Operations>

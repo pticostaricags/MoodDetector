@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodDetector", "MoodDetector\MoodDetector.csproj", "{537359A1-7F72-49CD-AC54-2872742C60BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodDetector.Tests", "MoodDetector.Tests\MoodDetector.Tests.csproj", "{8FEC1E5F-3905-4525-A6A8-3C2892F465A1}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MoodDetectorDatabase", "MoodDetectorDatabase\MoodDetectorDatabase.sqlproj", "{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodDetector.DataAccess", "MoodDetector.DataAccess\MoodDetector.DataAccess.csproj", "{3629E39D-6430-47BD-855D-306E9D69DC42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTI.CognitiveServicesClient", "PTI.CognitiveServicesClient\PTI.CognitiveServicesClient.csproj", "{43A2CEB3-C356-4C53-BC85-98569C4B9480}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{537359A1-7F72-49CD-AC54-2872742C60BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{537359A1-7F72-49CD-AC54-2872742C60BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{537359A1-7F72-49CD-AC54-2872742C60BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{537359A1-7F72-49CD-AC54-2872742C60BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FEC1E5F-3905-4525-A6A8-3C2892F465A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FEC1E5F-3905-4525-A6A8-3C2892F465A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FEC1E5F-3905-4525-A6A8-3C2892F465A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FEC1E5F-3905-4525-A6A8-3C2892F465A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F317B4C0-FE10-41F9-AB79-540BB2DC3CD8}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{3629E39D-6430-47BD-855D-306E9D69DC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3629E39D-6430-47BD-855D-306E9D69DC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3629E39D-6430-47BD-855D-306E9D69DC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3629E39D-6430-47BD-855D-306E9D69DC42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A2CEB3-C356-4C53-BC85-98569C4B9480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A2CEB3-C356-4C53-BC85-98569C4B9480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A2CEB3-C356-4C53-BC85-98569C4B9480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A2CEB3-C356-4C53-BC85-98569C4B9480}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

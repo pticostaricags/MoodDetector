@@ -1,0 +1,85 @@
+﻿@model IEnumerable<MoodDetector.Models.Entities.Facebook.MyPosts>
+@{
+    ViewBag.Title = "MyPosts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>MyPosts</h2>
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.ActionLink(linkText:"Analyze All My Posts",
+               actionName:"AnalyzeAllMyPosts", controllerName:"Facebook", 
+               routeValues: null,
+               htmlAttributes: new { @class = "btn btn-primary" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <label>Caption</label>
+            </div>
+            <div class="col-md-2">
+                <label>Created Time</label>
+            </div>
+            <div class="col-md-2">
+                <label>Description</label>
+            </div>
+            <div class="col-md-2">
+                <label>From</label>
+            </div>
+            <div class="col-md-2">
+                <label>Story</label>
+            </div>
+            <div class="col-md-2">
+                <label>Message</label>
+            </div>
+        </div>
+        @foreach (var singlePage in Model)
+        {
+            if (singlePage.data != null && singlePage.data.Count() > 0)
+            {
+                <div class="row">
+                    @if (singlePage.paging != null && !String.IsNullOrWhiteSpace(singlePage.paging.previous))
+                    {
+                    <div class="col-md-6">
+                        @Html.ActionLink(linkText:"Previous", controllerName:"Facebook", actionName:"MyPosts", routeValues:
+                       new { pageUrl = singlePage.paging.previous }, htmlAttributes:new { @class="btn btn-primary" })
+                    </div>
+                    }
+                    @if (singlePage.paging != null && !String.IsNullOrWhiteSpace(singlePage.paging.next))
+                    {
+                    <div class="col-md-6">
+                        @Html.ActionLink(linkText: "Next", controllerName: "Facebook", actionName: "MyPosts", routeValues:
+                       new { pageUrl = singlePage.paging.next }, htmlAttributes: new { @class = "btn btn-primary" })
+                    </div>
+                    }
+                </div>
+                    foreach (var singlePost in singlePage.data)
+                    {
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>@singlePost.caption</label>
+                        </div>
+                        <div class="col-md-2">
+                            <label>@singlePost.created_time</label>
+                        </div>
+                        <div class="col-md-2">
+                            <textarea rows="5">@singlePost.description  </textarea>
+                        </div>
+                        <div class="col-md-2">
+                            <label>@singlePost.from.name</label>
+                        </div>
+                        <div class="col-md-2">
+                            <label>@singlePost.story</label>
+                        </div>
+                        <div class="col-md-2">
+                            <textarea rows="5">@singlePost.message</textarea>
+                        </div>
+                    </div>
+                    }
+                    }
+                    }
+                </div>
+            }
