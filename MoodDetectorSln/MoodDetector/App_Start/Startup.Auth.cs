@@ -18,6 +18,9 @@ namespace MoodDetector
         public const string FacebookAppSecretKey = "FacebookApp-SecretKey";
 
         public const string MSCSTextAnalyticsKey = "MSCS-TextAnalyticsKey";
+
+        public const string WatsonPIPassword = "WatsonPIPassword";
+        public const string WatsonPIUserName = "WatsonPIUserName";
     }
     public partial class Startup
     {

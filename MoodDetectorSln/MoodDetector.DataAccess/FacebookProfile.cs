@@ -12,6 +12,7 @@ namespace MoodDetector.DataAccess
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public FacebookProfile()
         {
+            FacebookPersonalityInsights = new HashSet<FacebookPersonalityInsight>();
             FacebookUserPosts = new HashSet<FacebookUserPost>();
         }
 
@@ -26,6 +27,9 @@ namespace MoodDetector.DataAccess
         public string Username { get; set; }
 
         public DateTimeOffset DateRecordCreated { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FacebookPersonalityInsight> FacebookPersonalityInsights { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FacebookUserPost> FacebookUserPosts { get; set; }

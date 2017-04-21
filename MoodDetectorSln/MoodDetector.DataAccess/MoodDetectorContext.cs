@@ -12,6 +12,8 @@ namespace MoodDetector.DataAccess
         {
         }
 
+        public virtual DbSet<FacebookPersonalityInsight> FacebookPersonalityInsights { get; set; }
+        public virtual DbSet<FacebookPersonalityInsightsPersonality> FacebookPersonalityInsightsPersonalities { get; set; }
         public virtual DbSet<FacebookProfile> FacebookProfiles { get; set; }
         public virtual DbSet<FacebookUserPost> FacebookUserPosts { get; set; }
         public virtual DbSet<FacebookUserPostKeyPhras> FacebookUserPostKeyPhrases { get; set; }
@@ -19,6 +21,20 @@ namespace MoodDetector.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FacebookPersonalityInsight>()
+                .Property(e => e.ProcessedLanguage)
+                .IsFixedLength();
+
+            modelBuilder.Entity<FacebookPersonalityInsight>()
+                .HasMany(e => e.FacebookPersonalityInsightsPersonalities)
+                .WithRequired(e => e.FacebookPersonalityInsight)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookProfile>()
+                .HasMany(e => e.FacebookPersonalityInsights)
+                .WithRequired(e => e.FacebookProfile)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<FacebookProfile>()
                 .HasMany(e => e.FacebookUserPosts)
                 .WithRequired(e => e.FacebookProfile)

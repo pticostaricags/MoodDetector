@@ -82,6 +82,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIs\WatsonTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\HomeControllerTest.cs" />
   </ItemGroup>
@@ -95,6 +96,10 @@
     <ProjectReference Include="..\MoodDetector\MoodDetector.csproj">
       <Project>{537359A1-7F72-49CD-AC54-2872742C60BD}</Project>
       <Name>MoodDetector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PTI.CognitiveServicesClient\PTI.CognitiveServicesClient.csproj">
+      <Project>{43a2ceb3-c356-4c53-bc85-98569c4b9480}</Project>
+      <Name>PTI.CognitiveServicesClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
