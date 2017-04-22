@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="FacebookPersonalityInsight.cs" />
     <Compile Include="FacebookPersonalityInsightsBehavior.cs" />
+    <Compile Include="FacebookPersonalityInsightsConsumptionPreference.cs" />
     <Compile Include="FacebookPersonalityInsightsNeed.cs" />
     <Compile Include="FacebookPersonalityInsightsPersonality.cs" />
     <Compile Include="FacebookPersonalityInsightsValue.cs" />

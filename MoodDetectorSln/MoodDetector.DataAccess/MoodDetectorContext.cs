@@ -14,6 +14,7 @@ namespace MoodDetector.DataAccess
 
         public virtual DbSet<FacebookPersonalityInsight> FacebookPersonalityInsights { get; set; }
         public virtual DbSet<FacebookPersonalityInsightsBehavior> FacebookPersonalityInsightsBehaviors { get; set; }
+        public virtual DbSet<FacebookPersonalityInsightsConsumptionPreference> FacebookPersonalityInsightsConsumptionPreferences { get; set; }
         public virtual DbSet<FacebookPersonalityInsightsNeed> FacebookPersonalityInsightsNeeds { get; set; }
         public virtual DbSet<FacebookPersonalityInsightsPersonality> FacebookPersonalityInsightsPersonalities { get; set; }
         public virtual DbSet<FacebookPersonalityInsightsValue> FacebookPersonalityInsightsValues { get; set; }
@@ -29,7 +30,16 @@ namespace MoodDetector.DataAccess
                 .IsFixedLength();
 
             modelBuilder.Entity<FacebookPersonalityInsight>()
+                .Property(e => e.JsonRequest)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsight>()
                 .HasMany(e => e.FacebookPersonalityInsightsBehaviors)
+                .WithRequired(e => e.FacebookPersonalityInsight)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsight>()
+                .HasMany(e => e.FacebookPersonalityInsightsConsumptionPreferences)
                 .WithRequired(e => e.FacebookPersonalityInsight)
                 .WillCascadeOnDelete(false);
 
@@ -47,6 +57,11 @@ namespace MoodDetector.DataAccess
                 .HasMany(e => e.FacebookPersonalityInsightsValues)
                 .WithRequired(e => e.FacebookPersonalityInsight)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsightsConsumptionPreference>()
+                .HasMany(e => e.FacebookPersonalityInsightsConsumptionPreferences1)
+                .WithOptional(e => e.FacebookPersonalityInsightsConsumptionPreference1)
+                .HasForeignKey(e => e.ParentFacebookPersonalityInsightsConsumptionPreferencesId);
 
             modelBuilder.Entity<FacebookPersonalityInsightsPersonality>()
                 .HasMany(e => e.FacebookPersonalityInsightsPersonality1)

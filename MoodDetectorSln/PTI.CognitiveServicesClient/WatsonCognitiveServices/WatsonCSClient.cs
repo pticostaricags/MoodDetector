@@ -20,10 +20,15 @@ namespace PTI.CognitiveServicesClient.WatsonCognitiveServices
             this.Password = pPssword;
         }
 
-        public async Task<PersonalityInsightsResponse> GetProfile(PersonalityInsightsRequest request)
+        public struct GetProfileResults
+        {
+            public PersonalityInsightsResponse Response { get; set; }
+            public string JsonRequest { get; set; }
+        }
+        public async Task<GetProfileResults> GetProfile(PersonalityInsightsRequest request)
         {
             string currentDate = DateTime.Now.ToString("yyyy-MM-dd");
-            string getProfileUrl = "https://gateway.watsonplatform.net/personality-insights/api/v3/profile?version=" + currentDate;
+            string getProfileUrl = "https://gateway.watsonplatform.net/personality-insights/api/v3/profile?version=" + currentDate + "&consumption_preferences=true";
             string token = await this.GetTokenForPersonalityInsights();
             string jsonRequest = JsonConvert.SerializeObject(request);
             HttpClient objHttpClient = new HttpClient();
@@ -35,7 +40,7 @@ namespace PTI.CognitiveServicesClient.WatsonCognitiveServices
             string jsonResult = await response.Content.ReadAsStringAsync();
             PersonalityInsightsResponse objResult =
                 JsonConvert.DeserializeObject<PersonalityInsightsResponse>(jsonResult);
-            return objResult;
+            return new GetProfileResults() { Response = objResult, JsonRequest = jsonRequest };
         }
         public async Task<string> GetTokenForPersonalityInsights()
         {

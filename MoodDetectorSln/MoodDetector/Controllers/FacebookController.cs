@@ -13,6 +13,7 @@ using System.Web;
 using System.Web.Mvc;
 using MoodDetector.Models.Entities.Facebook;
 using PTI.CognitiveServicesClient.MSCognitiveServices.DetectLanguage;
+using MoodDetector.DataAccess;
 
 namespace MoodDetector.Controllers
 {
@@ -24,6 +25,20 @@ namespace MoodDetector.Controllers
             return new FacebookClient(base.FacebookAccessToken);
         }
 
+        public ActionResult MyConsumptionPreferences()
+        {
+            List<DataAccess.FacebookPersonalityInsightsConsumptionPreference>
+                result = null;
+            using (DataAccess.MoodDetectorContext ctx = new MoodDetectorContext())
+            {
+                ctx.Configuration.AutoDetectChangesEnabled = false;
+                result = ctx.FacebookPersonalityInsightsConsumptionPreferences
+                    .Include("FacebookPersonalityInsightsConsumptionPreferences1")
+                    .Include("FacebookPersonalityInsight")
+                    .ToList();
+            }
+            return View(result);
+        }
         public async Task<ActionResult> MyPosts(string pageUrl)
         {
             FacebookClient objClient = CreateFacebookClient();
@@ -56,6 +71,8 @@ namespace MoodDetector.Controllers
             Models.Entities.Facebook.PostsAnalysis objPostanalysis = null;
             using (DataAccess.MoodDetectorContext ctx = new DataAccess.MoodDetectorContext())
             {
+                ctx.Configuration.AutoDetectChangesEnabled = false;
+                ctx.Database.CommandTimeout = 3600; ;
                 var userPosts = ctx.FacebookUserPosts
                     .Include("FacebookUserPostSentiments")
                     .Include("FacebookUserPostKeyPhrases")
@@ -97,7 +114,7 @@ namespace MoodDetector.Controllers
             string userId = objMyPosts.data.First().from.id;
             int count = 0;
             int totalPosts = 0;
-            //while (count++ <= 3)
+            //while (count++ <= 2)
             while (objMyPosts.paging != null && !String.IsNullOrWhiteSpace(objMyPosts.paging.next))
             {
                 myPosts = await objClient.GetTaskAsync(objMyPosts.paging.next);
@@ -123,8 +140,8 @@ namespace MoodDetector.Controllers
             personalityInsightsReq.contentItems =
                 new Contentitem[totalPosts];
             int iPos = 0;
-            var detectedLanguages = 
-                (await DetectLanguage(allNotEmptyMessages, MSCognitiveServicesAccessToken)).SelectMany(p=>p.documents);
+            var detectedLanguages =
+                (await DetectLanguage(allNotEmptyMessages, MSCognitiveServicesAccessToken)).SelectMany(p => p.documents);
             foreach (var singlePost in allNotEmptyMessages)
             {
                 if (!string.IsNullOrWhiteSpace(singlePost.message))
@@ -166,16 +183,16 @@ namespace MoodDetector.Controllers
                 await InsertPostTopics(topicsReq, MSCognitiveServicesAccessToken);
                 await InsertKeyPhrases(keyPhrasesReq, MSCognitiveServicesAccessToken);
                 var piLanguageGroup = personalityInsightsReq.contentItems.GroupBy(p => p.language)
-                    .Select(x => 
+                    .Select(x =>
                     new
                     {
                         Language = x.Key,
                         Value = new PersonalityInsightsRequest()
                         {
-                        contentItems = x.ToArray()
+                            contentItems = x.ToArray()
                         }
                     }
-                    ).Where(p=>p.Language == "en" || p.Language == "es");
+                    ).Where(p => p.Language == "en" || p.Language == "es");
                 foreach (var singleLanguageRequest in piLanguageGroup)
                 {
                     await InsertPersonalityInsights(singleLanguageRequest.Value, piUsername: WatsonPIUserName, piPassword: WatsonPIPassword, facebookUserId: userId);
@@ -223,18 +240,51 @@ namespace MoodDetector.Controllers
                 if (userProfile == null)
                     userProfile = ctx.FacebookProfiles.Where(p => p.ProfileId == facebookUserId).FirstOrDefault();
                 DataAccess.FacebookPersonalityInsight daPI = new DataAccess.FacebookPersonalityInsight();
-                daPI.ProcessedLanguage = personalityInsights.processed_language;
-                daPI.WordCount = personalityInsights.word_count;
+                daPI.ProcessedLanguage = personalityInsights.Response.processed_language;
+                daPI.WordCount = personalityInsights.Response.word_count;
+                daPI.JsonRequest = personalityInsights.JsonRequest;
                 daPI.FacebookProfileId = userProfile.FacebookProfileId;
                 ctx.FacebookPersonalityInsights.Add(daPI);
                 ctx.SaveChanges();
-                ProcessPersonality(personalityInsights, ctx, daPI);
-                ProcessNeeds(personalityInsights, ctx, daPI);
-                ProcessBehavior(personalityInsights, ctx, daPI);
-                ProcessValues(personalityInsights, ctx, daPI);
+                ProcessPersonality(personalityInsights.Response, ctx, daPI);
+                ProcessNeeds(personalityInsights.Response, ctx, daPI);
+                ProcessBehavior(personalityInsights.Response, ctx, daPI);
+                ProcessValues(personalityInsights.Response, ctx, daPI);
+                ProcessConsumptionPreferences(personalityInsights.Response, ctx, daPI);
                 ctx.SaveChanges();
             }
             await Task.Yield();
+        }
+
+        private void ProcessConsumptionPreferences(PersonalityInsightsResponse personalityInsights, MoodDetectorContext ctx, FacebookPersonalityInsight daPI)
+        {
+            if (personalityInsights.consumption_preferences != null)
+            {
+                foreach (var singleConsumptionPreference in personalityInsights.consumption_preferences)
+                {
+                    DataAccess.FacebookPersonalityInsightsConsumptionPreference daCP =
+                        new FacebookPersonalityInsightsConsumptionPreference();
+                    daCP.PreferenceCategoryName = singleConsumptionPreference.name;
+                    daCP.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                    daCP.PreferenceCategoryId = singleConsumptionPreference.consumption_preference_category_id;
+                    ctx.FacebookPersonalityInsightsConsumptionPreferences.Add(daCP);
+                    ctx.SaveChanges();
+                    if (singleConsumptionPreference.consumption_preferences != null)
+                        foreach (var singleChildPreference in singleConsumptionPreference.consumption_preferences)
+                        {
+                            DataAccess.FacebookPersonalityInsightsConsumptionPreference daChildCP =
+                                new FacebookPersonalityInsightsConsumptionPreference();
+                            daChildCP.ParentFacebookPersonalityInsightsConsumptionPreferencesId =
+                                daCP.FacebookPersonalityInsightsConsumptionPreferencesId;
+                            daChildCP.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                            daChildCP.PreferenceCategoryId = singleChildPreference.consumption_preference_id;
+                            daChildCP.PreferenceName = singleChildPreference.name;
+                            daChildCP.PreferenceScore = singleChildPreference.score;
+                            ctx.FacebookPersonalityInsightsConsumptionPreferences.Add(daChildCP);
+                        }
+                    ctx.SaveChanges();
+                }
+            }
         }
 
         private static void ProcessValues(PersonalityInsightsResponse personalityInsights, DataAccess.MoodDetectorContext ctx, DataAccess.FacebookPersonalityInsight daPI)

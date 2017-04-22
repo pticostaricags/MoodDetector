@@ -4,5 +4,6 @@
     [WordCount] INT NOT NULL, 
     [ProcessedLanguage] NCHAR(10) NULL, 
     [FacebookProfileId] BIGINT NOT NULL, 
+    [JsonRequest] TEXT NOT NULL, 
     CONSTRAINT [FK_FacebookPersonalityInsights_FacebookProfile] FOREIGN KEY ([FacebookProfileId]) REFERENCES [FacebookProfile]([FacebookProfileId])
 )

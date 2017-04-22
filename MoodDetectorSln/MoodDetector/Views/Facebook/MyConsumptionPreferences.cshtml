@@ -1,0 +1,49 @@
+﻿@model IEnumerable<MoodDetector.DataAccess.FacebookPersonalityInsightsConsumptionPreference>
+@{
+    ViewBag.Title = "MyConsumptionPreferences";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>MyConsumptionPreferences</h2>
+@Html.ActionLink(linkText: "My Posts",
+               actionName: "MyPosts", controllerName: "Facebook",
+               routeValues: null,
+               htmlAttributes: new { @class = "btn btn-primary" })
+@if (Model != null && Model.Count() > 0)
+{
+    var groupedByLng = Model.GroupBy(p => p.FacebookPersonalityInsight.ProcessedLanguage)
+        .Select(x => new { Language = x.Key, ConsumerPreferences = x });
+    <div class="container">
+        @foreach (var singleLangePrefs in groupedByLng)
+        {
+            <div class="row">
+                Language: @singleLangePrefs.Language
+            </div>
+            <div class="row">
+                <div class="col-md-1">
+                    Category Name
+                </div>
+                <div class="col-md-10">
+                    Preference Name
+                </div>
+                <div class="col-md-1">
+                    Preference Score
+                </div>
+            </div>
+            foreach (var singlePreferenceCategory in singleLangePrefs.ConsumerPreferences)
+            {
+                <div class="row">
+                    <div class="col-md-1">
+                        @singlePreferenceCategory.PreferenceCategoryName
+                    </div>
+                    <div class="col-md-10">
+                        @singlePreferenceCategory.PreferenceName
+                    </div>
+                    <div class="col-md-1">
+                        @singlePreferenceCategory.PreferenceScore
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}

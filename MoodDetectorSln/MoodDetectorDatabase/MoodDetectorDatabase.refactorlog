@@ -98,4 +98,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FacebookPersonalityInsightsBehaviorId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="95eea5fe-29cd-4919-a082-a052c7d8eb75" ChangeDateTime="04/22/2017 15:21:24">
+    <Property Name="ElementName" Value="[dbo].[FacebookConsumptionPreferences].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookConsumptionPreferences]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FacebookConsumptionPreferencesId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="48f7f3e5-6827-4938-80b8-298195882b42" ChangeDateTime="04/22/2017 15:23:59">
+    <Property Name="ElementName" Value="[dbo].[FacebookConsumptionPreferences].[Name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FacebookConsumptionPreferences]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PreferenceCategoryName" />
+  </Operation>
 </Operations>
