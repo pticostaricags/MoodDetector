@@ -16,7 +16,7 @@ namespace MoodDetector
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Facebook", action = "MyPosts", id = UrlParameter.Optional }
+                defaults: new { controller = "Facebook", action = "MyConsumptionPreferences", id = UrlParameter.Optional }
             );
         }
     }

@@ -9,10 +9,16 @@
 {
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                @Html.ActionLink(linkText:"Analyze All My Posts",
-               actionName:"AnalyzeAllMyPosts", controllerName:"Facebook", 
-               routeValues: null,
+            <div class="col-md-6">
+                @Html.ActionLink(linkText:"Analyze All My Posts (Imports Data)",
+               actionName:"AnalyzeAllMyPosts", controllerName:"Facebook",
+               routeValues: new { runImports=true },
+               htmlAttributes: new { @class = "btn btn-primary" })
+            </div>
+            <div class="col-md-6">
+                @Html.ActionLink(linkText: "Analyze All My Posts (Without Importing Data)",
+               actionName: "AnalyzeAllMyPosts", controllerName: "Facebook",
+               routeValues: new  { runImports=false },
                htmlAttributes: new { @class = "btn btn-primary" })
             </div>
         </div>

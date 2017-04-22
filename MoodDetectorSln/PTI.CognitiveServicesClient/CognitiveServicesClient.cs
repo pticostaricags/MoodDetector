@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using PTI.CognitiveServicesClient.MSCognitiveServices.Topics;
 using PTI.CognitiveServicesClient.MSCognitiveServices.KeyPhrases;
+using PTI.CognitiveServicesClient.MSCognitiveServices.DetectLanguage;
+using Newtonsoft.Json;
 
 namespace PTI.CognitiveServicesClient
 {
@@ -66,6 +68,21 @@ namespace PTI.CognitiveServicesClient
             KeyPhrasesResponse objKeyPhrasesResponse =
                 Newtonsoft.Json.JsonConvert.DeserializeObject<KeyPhrasesResponse>(resultString);
             return objKeyPhrasesResponse;
+        }
+
+        public async Task<DetectLanguageResponse> DetectLanguage(DetectLanguageRequest request)
+        {
+            string detectLanguageUrl = "https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/languages";
+            HttpClient objHttpClient =
+                new HttpClient();
+            string jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+            StringContent objStrContent = new StringContent(jsonRequest);
+            objStrContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            objStrContent.Headers.Add("Ocp-Apim-Subscription-Key", AccessToken);
+            var result = await objHttpClient.PostAsync(detectLanguageUrl, objStrContent);
+            var resultString = await result.Content.ReadAsStringAsync();
+            var objDetectLanguageResponse = JsonConvert.DeserializeObject<DetectLanguageResponse>(resultString);
+            return objDetectLanguageResponse;
         }
     }
 }

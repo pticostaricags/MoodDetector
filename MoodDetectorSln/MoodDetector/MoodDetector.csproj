@@ -250,6 +250,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Facebook\MyPosts.cshtml" />
     <Content Include="Views\Facebook\AnalyzeAllMyPosts.cshtml" />
+    <Content Include="Views\Facebook\MyConsumptionPreferences.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

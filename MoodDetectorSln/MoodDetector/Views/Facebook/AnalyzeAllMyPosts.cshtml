@@ -41,6 +41,7 @@
                         @singleInsight.WordCount
                     </div>
                     <div class="col-md-10">
+                        <strong>Personality</strong>
                         <ul class="list-group">
                             @foreach (var singlePersonalityInsight in singleInsight.FacebookPersonalityInsightsPersonalities)
                             {
@@ -50,6 +51,45 @@
                                    singlePersonalityInsight.Name,
                                    singlePersonalityInsight.Percentile,
                                    singlePersonalityInsight.TraitId)
+                                </li>
+                            }
+                        </ul>
+                        <strong>Behavior</strong>
+                        <ul class="list-group">
+                            @foreach (var singleBehavior in singleInsight.FacebookPersonalityInsightsBehaviors)
+                            {
+                                <li class="list-group-item">
+                                    @string.Format("{0},{1},{2},{3}",
+                                   singleBehavior.Category,
+                                   singleBehavior.Name,
+                                   singleBehavior.Percentile,
+                                   singleBehavior.TraitId)
+                                </li>
+                            }
+                        </ul>
+                        <strong>Values</strong>
+                        <ul class="list-group">
+                            @foreach (var singleValue in singleInsight.FacebookPersonalityInsightsValues)
+                            {
+                                <li class="list-group-item">
+                                    @string.Format("{0},{1},{2},{3}",
+                                   singleValue.Category,
+                                   singleValue.Name,
+                                   singleValue.Percentile,
+                                   singleValue.TraitId)
+                                </li>
+                            }
+                        </ul>
+                        <strong>Needs</strong>
+                        <ul class="list-group">
+                            @foreach (var singleNeed in singleInsight.FacebookPersonalityInsightsNeeds)
+                            {
+                                <li class="list-group-item">
+                                    @string.Format("{0},{1},{2},{3}",
+                                   singleNeed.Category,
+                                   singleNeed.Name,
+                                   singleNeed.Percentile,
+                                   singleNeed.TraitId)
                                 </li>
                             }
                         </ul>
