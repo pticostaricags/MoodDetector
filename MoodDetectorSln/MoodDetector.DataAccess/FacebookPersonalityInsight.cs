@@ -11,7 +11,10 @@ namespace MoodDetector.DataAccess
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public FacebookPersonalityInsight()
         {
+            FacebookPersonalityInsightsBehaviors = new HashSet<FacebookPersonalityInsightsBehavior>();
+            FacebookPersonalityInsightsNeeds = new HashSet<FacebookPersonalityInsightsNeed>();
             FacebookPersonalityInsightsPersonalities = new HashSet<FacebookPersonalityInsightsPersonality>();
+            FacebookPersonalityInsightsValues = new HashSet<FacebookPersonalityInsightsValue>();
         }
 
         [Key]
@@ -27,6 +30,15 @@ namespace MoodDetector.DataAccess
         public virtual FacebookProfile FacebookProfile { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FacebookPersonalityInsightsBehavior> FacebookPersonalityInsightsBehaviors { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FacebookPersonalityInsightsNeed> FacebookPersonalityInsightsNeeds { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FacebookPersonalityInsightsPersonality> FacebookPersonalityInsightsPersonalities { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<FacebookPersonalityInsightsValue> FacebookPersonalityInsightsValues { get; set; }
     }
 }

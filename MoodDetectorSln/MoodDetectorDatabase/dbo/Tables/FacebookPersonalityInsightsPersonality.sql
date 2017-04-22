@@ -6,5 +6,7 @@
     [Name] NVARCHAR(50) NULL, 
     [Category] NVARCHAR(50) NULL, 
     [Percentile] FLOAT NULL, 
-    CONSTRAINT [FK_FacebookPersonalityInsightsPersonality_FacebookPersonalityInsights] FOREIGN KEY ([FacebookPersonalityInsightsId]) REFERENCES [FacebookPersonalityInsights]([FacebookPersonalityInsightsId])
+    [ParentFacebookPersonalityInsightsPersonalityId] BIGINT NULL, 
+    CONSTRAINT [FK_FacebookPersonalityInsightsPersonality_FacebookPersonalityInsights] FOREIGN KEY ([FacebookPersonalityInsightsId]) REFERENCES [FacebookPersonalityInsights]([FacebookPersonalityInsightsId]), 
+    CONSTRAINT [FK_FacebookPersonalityInsightsPersonality_FacebookPersonalityInsightsPersonality] FOREIGN KEY ([ParentFacebookPersonalityInsightsPersonalityId]) REFERENCES [FacebookPersonalityInsightsPersonality]([FacebookPersonalityInsightsPersonalityId])
 )

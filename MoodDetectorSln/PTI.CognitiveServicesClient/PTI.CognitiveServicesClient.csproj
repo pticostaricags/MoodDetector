@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CognitiveServicesClient.cs" />
+    <Compile Include="MSCognitiveServices\DetectLanguage\DetectLanguageRequest.cs" />
+    <Compile Include="MSCognitiveServices\DetectLanguage\DetectLanguageResponse.cs" />
     <Compile Include="MSCognitiveServices\KeyPhrases\KeyPhrasesRequest.cs" />
     <Compile Include="MSCognitiveServices\KeyPhrases\KeyPhrasesResponse.cs" />
     <Compile Include="MSCognitiveServices\Sentiment\SentimentRequest.cs" />

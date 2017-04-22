@@ -13,7 +13,10 @@ namespace MoodDetector.DataAccess
         }
 
         public virtual DbSet<FacebookPersonalityInsight> FacebookPersonalityInsights { get; set; }
+        public virtual DbSet<FacebookPersonalityInsightsBehavior> FacebookPersonalityInsightsBehaviors { get; set; }
+        public virtual DbSet<FacebookPersonalityInsightsNeed> FacebookPersonalityInsightsNeeds { get; set; }
         public virtual DbSet<FacebookPersonalityInsightsPersonality> FacebookPersonalityInsightsPersonalities { get; set; }
+        public virtual DbSet<FacebookPersonalityInsightsValue> FacebookPersonalityInsightsValues { get; set; }
         public virtual DbSet<FacebookProfile> FacebookProfiles { get; set; }
         public virtual DbSet<FacebookUserPost> FacebookUserPosts { get; set; }
         public virtual DbSet<FacebookUserPostKeyPhras> FacebookUserPostKeyPhrases { get; set; }
@@ -26,9 +29,29 @@ namespace MoodDetector.DataAccess
                 .IsFixedLength();
 
             modelBuilder.Entity<FacebookPersonalityInsight>()
+                .HasMany(e => e.FacebookPersonalityInsightsBehaviors)
+                .WithRequired(e => e.FacebookPersonalityInsight)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsight>()
+                .HasMany(e => e.FacebookPersonalityInsightsNeeds)
+                .WithRequired(e => e.FacebookPersonalityInsight)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsight>()
                 .HasMany(e => e.FacebookPersonalityInsightsPersonalities)
                 .WithRequired(e => e.FacebookPersonalityInsight)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsight>()
+                .HasMany(e => e.FacebookPersonalityInsightsValues)
+                .WithRequired(e => e.FacebookPersonalityInsight)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<FacebookPersonalityInsightsPersonality>()
+                .HasMany(e => e.FacebookPersonalityInsightsPersonality1)
+                .WithOptional(e => e.FacebookPersonalityInsightsPersonality2)
+                .HasForeignKey(e => e.ParentFacebookPersonalityInsightsPersonalityId);
 
             modelBuilder.Entity<FacebookProfile>()
                 .HasMany(e => e.FacebookPersonalityInsights)

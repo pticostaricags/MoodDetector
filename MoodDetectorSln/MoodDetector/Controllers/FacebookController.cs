@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using MoodDetector.Models.Entities.Facebook;
+using PTI.CognitiveServicesClient.MSCognitiveServices.DetectLanguage;
 
 namespace MoodDetector.Controllers
 {
@@ -40,11 +42,12 @@ namespace MoodDetector.Controllers
             return View(lstMyPosts);
         }
 
-        public async Task<ActionResult> AnalyzeAllMyPosts()
+        public async Task<ActionResult> AnalyzeAllMyPosts(bool runImports = true)
         {
             try
             {
-                //await ImportMyPosts();
+                if (runImports)
+                    await ImportMyPosts();
             }
             catch (Exception ex)
             {
@@ -59,6 +62,9 @@ namespace MoodDetector.Controllers
                     .Include("FacebookProfile")
                     .Include("FacebookProfile.FacebookPersonalityInsights")
                     .Include("FacebookProfile.FacebookPersonalityInsights.FacebookPersonalityInsightsPersonalities")
+                    .Include("FacebookProfile.FacebookPersonalityInsights.FacebookPersonalityInsightsBehaviors")
+                    .Include("FacebookProfile.FacebookPersonalityInsights.FacebookPersonalityInsightsNeeds")
+                    .Include("FacebookProfile.FacebookPersonalityInsights.FacebookPersonalityInsightsValues")
                     .ToList()
                     //.Where(p=>p.FacebookUserPostKeyPhrases.Count() > 0 && p.FacebookUserPostSentiments.Count() > 0).ToList()
                     ;
@@ -70,6 +76,14 @@ namespace MoodDetector.Controllers
         // GET: Facebook
         public async Task ImportMyPosts()
         {
+            string MSCognitiveServicesAccessToken =
+                System.Configuration.ConfigurationManager.AppSettings[
+                GlobalConstants.MSCSTextAnalyticsKey
+                ];
+            string WatsonPIUserName =
+                ConfigurationManager.AppSettings[GlobalConstants.WatsonPIUserName];
+            string WatsonPIPassword =
+                ConfigurationManager.AppSettings[GlobalConstants.WatsonPIPassword];
             //Check https://developers.facebook.com/docs/graph-api/reference/v2.8/user/feed
             FacebookClient objClient = CreateFacebookClient();
             dynamic myPosts = await objClient.GetTaskAsync(@"me/posts?fields=id,application,caption,created_time,description,from,message,name,status_type,story,type");
@@ -83,7 +97,7 @@ namespace MoodDetector.Controllers
             string userId = objMyPosts.data.First().from.id;
             int count = 0;
             int totalPosts = 0;
-            //while (count++ <= 5)
+            //while (count++ <= 3)
             while (objMyPosts.paging != null && !String.IsNullOrWhiteSpace(objMyPosts.paging.next))
             {
                 myPosts = await objClient.GetTaskAsync(objMyPosts.paging.next);
@@ -109,6 +123,8 @@ namespace MoodDetector.Controllers
             personalityInsightsReq.contentItems =
                 new Contentitem[totalPosts];
             int iPos = 0;
+            var detectedLanguages = 
+                (await DetectLanguage(allNotEmptyMessages, MSCognitiveServicesAccessToken)).SelectMany(p=>p.documents);
             foreach (var singlePost in allNotEmptyMessages)
             {
                 if (!string.IsNullOrWhiteSpace(singlePost.message))
@@ -131,29 +147,67 @@ namespace MoodDetector.Controllers
                         new Contentitem();
                     personalityInsightsReq.contentItems[iPos].content = singlePost.message;
                     personalityInsightsReq.contentItems[iPos].id = singlePost.id;
+
+                    var language = detectedLanguages.Where(p => p.id == singlePost.id).FirstOrDefault();
+                    if (language != null && language.detectedLanguages.Count() > 0)
+                    {
+                        string languageCode = language.detectedLanguages.First().iso6391Name;
+                        personalityInsightsReq.contentItems[iPos].language = languageCode;
+                        sentimentReq.documents[iPos].language = languageCode;
+                        keyPhrasesReq.documents[iPos].language = languageCode;
+                    }
                     iPos++;
                 }
             }
-            string MSCognitiveServicesAccessToken =
-                System.Configuration.ConfigurationManager.AppSettings[
-                GlobalConstants.MSCSTextAnalyticsKey
-                ];
-            string WatsonPIUserName =
-                ConfigurationManager.AppSettings[GlobalConstants.WatsonPIUserName];
-            string WatsonPIPassword =
-                ConfigurationManager.AppSettings[GlobalConstants.WatsonPIPassword];
             try
             {
                 SaveToDatabase(lstMyPosts);
-                //await InsertPostsSentiment(sentimentReq, MSCognitiveServicesAccessToken);
-                //await InsertPostTopics(topicsReq, MSCognitiveServicesAccessToken);
-                //await InsertKeyPhrases(keyPhrasesReq, MSCognitiveServicesAccessToken);
-                await InsertPersonalityInsights(personalityInsightsReq, piUsername:WatsonPIUserName, piPassword:WatsonPIPassword, facebookUserId:userId);
+                await InsertPostsSentiment(sentimentReq, MSCognitiveServicesAccessToken);
+                await InsertPostTopics(topicsReq, MSCognitiveServicesAccessToken);
+                await InsertKeyPhrases(keyPhrasesReq, MSCognitiveServicesAccessToken);
+                var piLanguageGroup = personalityInsightsReq.contentItems.GroupBy(p => p.language)
+                    .Select(x => 
+                    new
+                    {
+                        Language = x.Key,
+                        Value = new PersonalityInsightsRequest()
+                        {
+                        contentItems = x.ToArray()
+                        }
+                    }
+                    ).Where(p=>p.Language == "en" || p.Language == "es");
+                foreach (var singleLanguageRequest in piLanguageGroup)
+                {
+                    await InsertPersonalityInsights(singleLanguageRequest.Value, piUsername: WatsonPIUserName, piPassword: WatsonPIPassword, facebookUserId: userId);
+                }
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
+
+        private async Task<List<DetectLanguageResponse>> DetectLanguage(IEnumerable<Datum> allNotEmptyMessages,
+            string MSCognitiveServicesAccessToken)
+        {
+            List<DetectLanguageResponse> lstResponses = new List<DetectLanguageResponse>();
+            CognitiveServicesClient objCsClient = new CognitiveServicesClient(MSCognitiveServicesAccessToken);
+            int totalPages = (int)Math.Ceiling((decimal)allNotEmptyMessages.Count() / (decimal)1000);
+            for (int iPage = 0; iPage < totalPages; iPage++)
+            {
+                var reqBatch = allNotEmptyMessages.Skip(iPage * 1000).Take(1000);
+                var tmpReq = new DetectLanguageRequest();
+                tmpReq.documents = allNotEmptyMessages.Select(p =>
+                new DetectLanguageRequestDocument()
+                {
+                    id = p.id,
+                    text = p.message
+                }
+                ).Skip(iPage * 1000).Take(1000).ToArray();
+                var detectedLanguages = await objCsClient.DetectLanguage(tmpReq);
+                lstResponses.Add(detectedLanguages);
+            }
+            return lstResponses;
         }
 
         private async Task InsertPersonalityInsights(PersonalityInsightsRequest personalityInsightsReq,
@@ -163,38 +217,105 @@ namespace MoodDetector.Controllers
         {
             DataAccess.FacebookProfile userProfile = null;
             WatsonCSClient objWatsonCsClient = new WatsonCSClient(piUsername, piPassword);
-            int totalPages = (int)Math.Ceiling((decimal)personalityInsightsReq.contentItems.Count() / (decimal)1000);
-            for (int iPage = 0; iPage < totalPages; iPage++)
+            var personalityInsights = await objWatsonCsClient.GetProfile(personalityInsightsReq);
+            using (DataAccess.MoodDetectorContext ctx = new DataAccess.MoodDetectorContext())
             {
-                var reqBatch = personalityInsightsReq.contentItems.Skip(iPage * 1000).Take(1000);
-                PersonalityInsightsRequest tmpReq = new PersonalityInsightsRequest();
-                tmpReq.contentItems = reqBatch.ToArray();
-                var personalityInsights = await objWatsonCsClient.GetProfile(tmpReq);
-                using (DataAccess.MoodDetectorContext ctx = new DataAccess.MoodDetectorContext())
-                {
-                    if (userProfile == null)
-                        userProfile = ctx.FacebookProfiles.Where(p => p.ProfileId == facebookUserId).FirstOrDefault();
-                    DataAccess.FacebookPersonalityInsight daPI = new DataAccess.FacebookPersonalityInsight();
-                    daPI.ProcessedLanguage = personalityInsights.processed_language;
-                    daPI.WordCount = personalityInsights.word_count;
-                    daPI.FacebookProfileId = userProfile.FacebookProfileId;
-                    ctx.FacebookPersonalityInsights.Add(daPI);
-                    ctx.SaveChanges();
-                    foreach (var singlePersonalityRecord in personalityInsights.personality)
-                    {
-                        DataAccess.FacebookPersonalityInsightsPersonality daPersonality =
-                            new DataAccess.FacebookPersonalityInsightsPersonality();
-                        daPersonality.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
-                        daPersonality.Category = singlePersonalityRecord.category;
-                        daPersonality.Name = singlePersonalityRecord.name;
-                        daPersonality.Percentile = singlePersonalityRecord.percentile;
-                        daPersonality.TraitId = singlePersonalityRecord.trait_id;
-                        ctx.FacebookPersonalityInsightsPersonalities.Add(daPersonality);
-                    }
-                    ctx.SaveChanges();
-                }
+                if (userProfile == null)
+                    userProfile = ctx.FacebookProfiles.Where(p => p.ProfileId == facebookUserId).FirstOrDefault();
+                DataAccess.FacebookPersonalityInsight daPI = new DataAccess.FacebookPersonalityInsight();
+                daPI.ProcessedLanguage = personalityInsights.processed_language;
+                daPI.WordCount = personalityInsights.word_count;
+                daPI.FacebookProfileId = userProfile.FacebookProfileId;
+                ctx.FacebookPersonalityInsights.Add(daPI);
+                ctx.SaveChanges();
+                ProcessPersonality(personalityInsights, ctx, daPI);
+                ProcessNeeds(personalityInsights, ctx, daPI);
+                ProcessBehavior(personalityInsights, ctx, daPI);
+                ProcessValues(personalityInsights, ctx, daPI);
+                ctx.SaveChanges();
             }
             await Task.Yield();
+        }
+
+        private static void ProcessValues(PersonalityInsightsResponse personalityInsights, DataAccess.MoodDetectorContext ctx, DataAccess.FacebookPersonalityInsight daPI)
+        {
+            if (personalityInsights.values != null)
+                foreach (var singleValue in personalityInsights.values)
+                {
+                    DataAccess.FacebookPersonalityInsightsValue daValues =
+                        new DataAccess.FacebookPersonalityInsightsValue();
+                    daValues.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                    daValues.Category = singleValue.category;
+                    daValues.Name = singleValue.name;
+                    daValues.Percentile = singleValue.percentile;
+                    daValues.TraitId = singleValue.trait_id;
+                    ctx.FacebookPersonalityInsightsValues.Add(daValues);
+                }
+        }
+
+        private static void ProcessBehavior(PersonalityInsightsResponse personalityInsights, DataAccess.MoodDetectorContext ctx, DataAccess.FacebookPersonalityInsight daPI)
+        {
+            if (personalityInsights.needs != null)
+                foreach (var singleBehavior in personalityInsights.behavior)
+                {
+                    DataAccess.FacebookPersonalityInsightsBehavior daBehavior =
+                        new DataAccess.FacebookPersonalityInsightsBehavior();
+                    daBehavior.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                    daBehavior.Category = singleBehavior.category;
+                    daBehavior.Name = singleBehavior.name;
+                    daBehavior.Percentile = singleBehavior.percentage;
+                    daBehavior.TraitId = singleBehavior.trait_id;
+                    ctx.FacebookPersonalityInsightsBehaviors.Add(daBehavior);
+                }
+        }
+
+        private static void ProcessNeeds(PersonalityInsightsResponse personalityInsights, DataAccess.MoodDetectorContext ctx, DataAccess.FacebookPersonalityInsight daPI)
+        {
+            if (personalityInsights.needs != null)
+                foreach (var singleNeed in personalityInsights.needs)
+                {
+                    DataAccess.FacebookPersonalityInsightsNeed daNeed =
+                        new DataAccess.FacebookPersonalityInsightsNeed();
+                    daNeed.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                    daNeed.Category = singleNeed.category;
+                    daNeed.Name = singleNeed.name;
+                    daNeed.Percentile = singleNeed.percentile;
+                    daNeed.TraitId = singleNeed.trait_id;
+                    ctx.FacebookPersonalityInsightsNeeds.Add(daNeed);
+                }
+        }
+
+        private static void ProcessPersonality(PersonalityInsightsResponse personalityInsights, DataAccess.MoodDetectorContext ctx, DataAccess.FacebookPersonalityInsight daPI)
+        {
+            if (personalityInsights.personality != null)
+                foreach (var singlePersonalityRecord in personalityInsights.personality)
+                {
+                    DataAccess.FacebookPersonalityInsightsPersonality daPersonality =
+                        new DataAccess.FacebookPersonalityInsightsPersonality();
+                    daPersonality.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                    daPersonality.Category = singlePersonalityRecord.category;
+                    daPersonality.Name = singlePersonalityRecord.name;
+                    daPersonality.Percentile = singlePersonalityRecord.percentile;
+                    daPersonality.TraitId = singlePersonalityRecord.trait_id;
+                    ctx.FacebookPersonalityInsightsPersonalities.Add(daPersonality);
+                    ctx.SaveChanges();
+                    long parentId = daPersonality.FacebookPersonalityInsightsPersonalityId;
+                    if (singlePersonalityRecord.children != null && singlePersonalityRecord.children.Count() > 0)
+                    {
+                        foreach (var singlePersonalityChild in singlePersonalityRecord.children)
+                        {
+                            daPersonality = new DataAccess.FacebookPersonalityInsightsPersonality();
+                            daPersonality.FacebookPersonalityInsightsId = daPI.FacebookPersonalityInsightsId;
+                            daPersonality.ParentFacebookPersonalityInsightsPersonalityId = parentId;
+                            daPersonality.Category = singlePersonalityChild.category;
+                            daPersonality.Name = singlePersonalityChild.name;
+                            daPersonality.Percentile = singlePersonalityChild.percentile;
+                            daPersonality.TraitId = singlePersonalityChild.trait_id;
+                            ctx.FacebookPersonalityInsightsPersonalities.Add(daPersonality);
+                            ctx.SaveChanges();
+                        }
+                    }
+                }
         }
 
         private async Task InsertKeyPhrases(KeyPhrasesRequest keyPhrasesReq, string MSCognitiveServicesAccessToken)
